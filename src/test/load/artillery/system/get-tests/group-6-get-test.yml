@@ -1,0 +1,60 @@
+config:
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+  http:
+    # Set a max of five TCP connections per virtual user.
+    pool: 10
+  payload:
+    # path is relative to the location of the test script
+    path: "../test-subset-gr6.csv"
+    fields:
+      - "id"
+      - "creationTime"
+      - "ttl"
+  target: http://192.168.0.150:6898
+  phases:
+    - duration: 10
+      arrivalRate: 5
+    - duration: 20
+      arrivalRate: 8
+    - duration: 1800
+      arrivalRate: 10
+
+scenarios:
+  - name: parallel-get
+    weight: 1
+    flow:
+      - get:
+          url: "http://192.168.0.150:4025/nomad/storage/get/{{ id }}"
+          name: parallel-get
+          
+  # - name: fast-put
+  #   weight: 1
+  #   flow:
+  #     - post:
+  #         url: "http://192.168.0.150:4023/nomad/storage/put"
+  #         json:
+  #           id: "{{ $randomString() }}"
+  #           creationTime: "1621163649"
+  #           ttl: "{{ ttl }}"
+  #           value: "dGhpcyBpcyBhIHZlcnkgbG9uZyBzZW50ZW5jZSBhZG5hc2QgIGRzZGZzZC5rZmhqc2FkYWtzbGRqa2Roa2RqaHNhO2lvZnVoYWY7aW91Z2hmO2l1Z2V3YTtma2piZmRrc2Foc29maWR1Z2ZpYXVlZ3JpaGtqZmJobGRrZmpoZ2FlaXVoaSBoaCBocmggcnVoIGhwaGVydWggdyB1aCBpdWggaWZldSBpdWdmaSB1cGl1IGdmcGl1ZyBpdWZnIGl1Z2ZpbHVnIGxpdWcgaXVmIGdpdXdlcGRoanNnZmxhc2ZsaXd1ZXJncHdibnNsYXdpZXVyZ3dhbGhqZmdhc2ptZGZoZ2lkZnV5cGFlYndybHdpamhnYmZwaXdhdWJ3Zm5hbHdiZWZpdXdnZWZtbHdhbmZibGlhd3V5ZWFyZ2ZzaWpoZ2x3ZWdmaXV3ZWdyaWdza2pmZ2VmZ3dhdXJnZWlnaWZ1Z3dlaXJqc2RnaXNnZmxha2poc2dkamhnamhzZGdqZGhzZ2pkZ2Zpc3Vka2JubWVoYWxpa3VoZXdmcGh3azIzeTk4Mzc1ajJnaDUwMWpraGQ5OXh1ZG8xaXUyMDl1MTJlIDl1IDA5dTEgMDl1MTIwOXUgMDl1MDl1MHUwdWYgb2loZXdmaHdlaXVqaCAyMTBrIDFud2Vpa2lmdXkgMHd5dTM1a2ogMmggMDk3cmpob3dlcnA7cDlvYThlZnlhd2lqZmh3a2plaGdyOTgyIGhqMyAzOHkgOXdyaGtqMmdoIDNyOTI4M3J5ICBmaDlpM3I4IGhpM3JuMjg5IG4yIDkzanIgOTg3M3kgaGlrdyB5aHI5MjgzNSAyamhnIDk4eQ=="
+  #           name: fast-put
+
+  - name: peer-2
+    weight: 1
+    flow:
+      - get:
+          url: "http://192.168.0.150:4039/nomad/storage/get/{{ id }}"
+
+  - name: peer-3
+    weight: 1
+    flow:
+      - get:
+          url: "http://192.168.0.150:4008/nomad/storage/get/{{ id }}"
+
+  - name: peer-4
+    weight: 1
+    flow:
+      - get:
+          url: "http://192.168.0.150:4033/nomad/storage/get/{{ id }}"

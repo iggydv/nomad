@@ -1,0 +1,65 @@
+config:
+  payload:
+    # path is relative to the location of the test script
+    # path: "test-objects-tiny.csv"
+    path: "../test-objects-gr1.csv"
+    order: sequence
+    fields:
+      - "id"
+      - "creationTime"
+      - "ttl"
+  target: http://192.168.0.150:6898
+  phases:
+    - duration: 10
+      arrivalRate: 5
+    - duration: 20
+      arrivalRate: 8
+    - duration: 30
+      arrivalRate: 50
+    - duration: 300
+      arrivalRate: 100
+
+scenarios:
+  - name: peer-1
+    weight: 1
+    flow:
+      - post:
+          url: "http://192.168.0.150:4036/nomad/storage/put"
+          json:
+            id: "{{ id }}"
+            creationTime: "{{ creationTime }}"
+            ttl: "{{ ttl }}"
+            value: "dGhpcyBpcyBhIHZlcnkgbG9uZyBzZW50ZW5jZSBhZG5hc2QgIGRzZGZzZC5rZmhqc2FkYWtzbGRqa2Roa2RqaHNhO2lvZnVoYWY7aW91Z2hmO2l1Z2V3YTtma2piZmRrc2Foc29maWR1Z2ZpYXVlZ3JpaGtqZmJobGRrZmpoZ2FlaXVoaSBoaCBocmggcnVoIGhwaGVydWggdyB1aCBpdWggaWZldSBpdWdmaSB1cGl1IGdmcGl1ZyBpdWZnIGl1Z2ZpbHVnIGxpdWcgaXVmIGdpdXdlcGRoanNnZmxhc2ZsaXd1ZXJncHdibnNsYXdpZXVyZ3dhbGhqZmdhc2ptZGZoZ2lkZnV5cGFlYndybHdpamhnYmZwaXdhdWJ3Zm5hbHdiZWZpdXdnZWZtbHdhbmZibGlhd3V5ZWFyZ2ZzaWpoZ2x3ZWdmaXV3ZWdyaWdza2pmZ2VmZ3dhdXJnZWlnaWZ1Z3dlaXJqc2RnaXNnZmxha2poc2dkamhnamhzZGdqZGhzZ2pkZ2Zpc3Vka2JubWVoYWxpa3VoZXdmcGh3azIzeTk4Mzc1ajJnaDUwMWpraGQ5OXh1ZG8xaXUyMDl1MTJlIDl1IDA5dTEgMDl1MTIwOXUgMDl1MDl1MHUwdWYgb2loZXdmaHdlaXVqaCAyMTBrIDFud2Vpa2lmdXkgMHd5dTM1a2ogMmggMDk3cmpob3dlcnA7cDlvYThlZnlhd2lqZmh3a2plaGdyOTgyIGhqMyAzOHkgOXdyaGtqMmdoIDNyOTI4M3J5ICBmaDlpM3I4IGhpM3JuMjg5IG4yIDkzanIgOTg3M3kgaGlrdyB5aHI5MjgzNSAyamhnIDk4eQ=="
+
+  - name: peer-2
+    weight: 1
+    flow:
+      - post:
+          url: "http://192.168.0.150:4034/nomad/storage/put"
+          json:
+            id: "{{ id }}"
+            creationTime: "{{ creationTime }}"
+            ttl: "{{ ttl }}"
+            value: "dGhpcyBpcyBhIHZlcnkgbG9uZyBzZW50ZW5jZSBhZG5hc2QgIGRzZGZzZC5rZmhqc2FkYWtzbGRqa2Roa2RqaHNhO2lvZnVoYWY7aW91Z2hmO2l1Z2V3YTtma2piZmRrc2Foc29maWR1Z2ZpYXVlZ3JpaGtqZmJobGRrZmpoZ2FlaXVoaSBoaCBocmggcnVoIGhwaGVydWggdyB1aCBpdWggaWZldSBpdWdmaSB1cGl1IGdmcGl1ZyBpdWZnIGl1Z2ZpbHVnIGxpdWcgaXVmIGdpdXdlcGRoanNnZmxhc2ZsaXd1ZXJncHdibnNsYXdpZXVyZ3dhbGhqZmdhc2ptZGZoZ2lkZnV5cGFlYndybHdpamhnYmZwaXdhdWJ3Zm5hbHdiZWZpdXdnZWZtbHdhbmZibGlhd3V5ZWFyZ2ZzaWpoZ2x3ZWdmaXV3ZWdyaWdza2pmZ2VmZ3dhdXJnZWlnaWZ1Z3dlaXJqc2RnaXNnZmxha2poc2dkamhnamhzZGdqZGhzZ2pkZ2Zpc3Vka2JubWVoYWxpa3VoZXdmcGh3azIzeTk4Mzc1ajJnaDUwMWpraGQ5OXh1ZG8xaXUyMDl1MTJlIDl1IDA5dTEgMDl1MTIwOXUgMDl1MDl1MHUwdWYgb2loZXdmaHdlaXVqaCAyMTBrIDFud2Vpa2lmdXkgMHd5dTM1a2ogMmggMDk3cmpob3dlcnA7cDlvYThlZnlhd2lqZmh3a2plaGdyOTgyIGhqMyAzOHkgOXdyaGtqMmdoIDNyOTI4M3J5ICBmaDlpM3I4IGhpM3JuMjg5IG4yIDkzanIgOTg3M3kgaGlrdyB5aHI5MjgzNSAyamhnIDk4eQ=="
+
+  - name: peer-3
+    weight: 1
+    flow:
+      - post:
+          url: "http://192.168.0.150:4006/nomad/storage/put"
+          json:
+            id: "{{ id }}"
+            creationTime: "{{ creationTime }}"
+            ttl: "{{ ttl }}"
+            value: "dGhpcyBpcyBhIHZlcnkgbG9uZyBzZW50ZW5jZSBhZG5hc2QgIGRzZGZzZC5rZmhqc2FkYWtzbGRqa2Roa2RqaHNhO2lvZnVoYWY7aW91Z2hmO2l1Z2V3YTtma2piZmRrc2Foc29maWR1Z2ZpYXVlZ3JpaGtqZmJobGRrZmpoZ2FlaXVoaSBoaCBocmggcnVoIGhwaGVydWggdyB1aCBpdWggaWZldSBpdWdmaSB1cGl1IGdmcGl1ZyBpdWZnIGl1Z2ZpbHVnIGxpdWcgaXVmIGdpdXdlcGRoanNnZmxhc2ZsaXd1ZXJncHdibnNsYXdpZXVyZ3dhbGhqZmdhc2ptZGZoZ2lkZnV5cGFlYndybHdpamhnYmZwaXdhdWJ3Zm5hbHdiZWZpdXdnZWZtbHdhbmZibGlhd3V5ZWFyZ2ZzaWpoZ2x3ZWdmaXV3ZWdyaWdza2pmZ2VmZ3dhdXJnZWlnaWZ1Z3dlaXJqc2RnaXNnZmxha2poc2dkamhnamhzZGdqZGhzZ2pkZ2Zpc3Vka2JubWVoYWxpa3VoZXdmcGh3azIzeTk4Mzc1ajJnaDUwMWpraGQ5OXh1ZG8xaXUyMDl1MTJlIDl1IDA5dTEgMDl1MTIwOXUgMDl1MDl1MHUwdWYgb2loZXdmaHdlaXVqaCAyMTBrIDFud2Vpa2lmdXkgMHd5dTM1a2ogMmggMDk3cmpob3dlcnA7cDlvYThlZnlhd2lqZmh3a2plaGdyOTgyIGhqMyAzOHkgOXdyaGtqMmdoIDNyOTI4M3J5ICBmaDlpM3I4IGhpM3JuMjg5IG4yIDkzanIgOTg3M3kgaGlrdyB5aHI5MjgzNSAyamhnIDk4eQ=="
+
+  - name: peer-4
+    weight: 1
+    flow:
+      - post:
+          url: "http://192.168.0.150:4031/nomad/storage/put"
+          json:
+            id: "{{ id }}"
+            creationTime: "{{ creationTime }}"
+            ttl: "{{ ttl }}"
+            value: "dGhpcyBpcyBhIHZlcnkgbG9uZyBzZW50ZW5jZSBhZG5hc2QgIGRzZGZzZC5rZmhqc2FkYWtzbGRqa2Roa2RqaHNhO2lvZnVoYWY7aW91Z2hmO2l1Z2V3YTtma2piZmRrc2Foc29maWR1Z2ZpYXVlZ3JpaGtqZmJobGRrZmpoZ2FlaXVoaSBoaCBocmggcnVoIGhwaGVydWggdyB1aCBpdWggaWZldSBpdWdmaSB1cGl1IGdmcGl1ZyBpdWZnIGl1Z2ZpbHVnIGxpdWcgaXVmIGdpdXdlcGRoanNnZmxhc2ZsaXd1ZXJncHdibnNsYXdpZXVyZ3dhbGhqZmdhc2ptZGZoZ2lkZnV5cGFlYndybHdpamhnYmZwaXdhdWJ3Zm5hbHdiZWZpdXdnZWZtbHdhbmZibGlhd3V5ZWFyZ2ZzaWpoZ2x3ZWdmaXV3ZWdyaWdza2pmZ2VmZ3dhdXJnZWlnaWZ1Z3dlaXJqc2RnaXNnZmxha2poc2dkamhnamhzZGdqZGhzZ2pkZ2Zpc3Vka2JubWVoYWxpa3VoZXdmcGh3azIzeTk4Mzc1ajJnaDUwMWpraGQ5OXh1ZG8xaXUyMDl1MTJlIDl1IDA5dTEgMDl1MTIwOXUgMDl1MDl1MHUwdWYgb2loZXdmaHdlaXVqaCAyMTBrIDFud2Vpa2lmdXkgMHd5dTM1a2ogMmggMDk3cmpob3dlcnA7cDlvYThlZnlhd2lqZmh3a2plaGdyOTgyIGhqMyAzOHkgOXdyaGtqMmdoIDNyOTI4M3J5ICBmaDlpM3I4IGhpM3JuMjg5IG4yIDkzanIgOTg3M3kgaGlrdyB5aHI5MjgzNSAyamhnIDk4eQ=="

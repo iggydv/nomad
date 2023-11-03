@@ -1,0 +1,18 @@
+config:
+  target: http://192.168.0.150:6898
+  phases:
+    - duration: 1
+      arrivalRate: 1
+
+scenarios:
+  - name: peer-1
+    weight: 1
+    flow:
+      - post:
+          url: "http://192.168.0.150:4024/nomad/config/retrieval?retrievalMode=SAFE"
+      - post:
+          url: "http://192.168.0.150:4020/nomad/config/retrieval?retrievalMode=SAFE"
+      - post:
+          url: "http://192.168.0.150:4041/nomad/config/retrieval?retrievalMode=SAFE"
+      - post:
+          url: "http://192.168.0.150:4010/nomad/config/retrieval?retrievalMode=SAFE"

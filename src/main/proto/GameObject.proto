@@ -1,0 +1,13 @@
+syntax = "proto3";
+package grpc.models;
+option java_package = "org.nomad.grpc.models";
+option java_multiple_files = true;
+option java_outer_classname = "GameObject";
+
+message GameObjectGrpc {
+  string id = 1;
+  int64 creationTime = 2;
+  int64 ttl = 3;
+  bytes value = 4;
+  int64 lastModified = 5;
+}

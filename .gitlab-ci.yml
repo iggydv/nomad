@@ -1,0 +1,44 @@
+# You can override the included template(s) by including variable overrides
+# See https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+# Note that environment variables can be set in several places
+# See https://docs.gitlab.com/ee/ci/variables/#priority-of-environment-variables
+image: maven:3.8-openjdk-8
+
+variables:
+  MAVEN_CLI_OPTS: "--batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  SAST_DISABLE_DIND: "true"
+
+stages:
+  - build
+  - test
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
+  
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .m2/repository
+
+build:
+  stage: build
+  script:
+    - echo "Installing chord dependencies"
+    - mvn install:install-file -Dfile=lib/open-chord-1.0.6.jar -DgroupId=com.chord -DartifactId=open-chord -Dversion=1.0.6
+    - echo "Building"
+    - mvn $MAVEN_CLI_OPTS compile
+  artifacts:
+    paths:
+      - .m2/repository
+      - target/
+
+test:
+  stage: test
+  script:
+    - mvn $MAVEN_CLI_OPTS test
+  artifacts:
+    paths:
+      - .m2/repository
+      - target/

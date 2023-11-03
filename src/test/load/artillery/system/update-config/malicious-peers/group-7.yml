@@ -1,0 +1,18 @@
+config:
+  target: http://192.168.0.150:6898
+  phases:
+    - duration: 1
+      arrivalRate: 1
+
+scenarios:
+  - name: peer-1
+    weight: 1
+    flow:
+      - post:
+          url: "http://192.168.0.150:4017/nomad/config/groups/testing/malicious-peer?enabled=false"
+      - post:
+          url: "http://192.168.0.150:4045/nomad/config/groups/testing/malicious-peer?enabled=false"
+      - post:
+          url: "http://192.168.0.150:4032/nomad/config/groups/testing/malicious-peer?enabled=false"
+      - post:
+          url: "http://192.168.0.150:4047/nomad/config/groups/testing/malicious-peer?enabled=false"

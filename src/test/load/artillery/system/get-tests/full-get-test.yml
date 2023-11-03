@@ -1,0 +1,35 @@
+config:
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true
+  http:
+    # Set a max of five TCP connections per virtual user.
+    pool: 10
+  payload:
+    # path is relative to the location of the test script
+    - path: "../test-subset-gr-1.csv"
+      fields:
+        - "id"
+        - "creationTime"
+        - "ttl"
+        - "value"
+    - path: "../../hosts.csv"
+      order: sequence
+      fields:
+        - "host"
+  target: http://192.168.0.150:6898
+  phases:
+    - duration: 10
+      arrivalRate: 10
+    - duration: 20
+      arrivalRate: 50
+    - duration: 1800
+      arrivalRate: 100
+
+scenarios:
+  - name: get
+    weight: 1
+    flow:
+      - get:
+          url: "http://{{ host }}/nomad/storage/get/{{ id }}"
+          name: get

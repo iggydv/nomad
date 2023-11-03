@@ -1,0 +1,452 @@
+openapi: 3.0.3
+
+info:
+  description: "Nomad Storage operations for peers"
+  version: "1.0.0"
+  title: Nomad API
+  contact:
+    email: iggydv12@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+paths:
+  /storage/put:
+    post:
+      summary: add an object to group/overlay storage
+      operationId: putObject
+      responses:
+        '200':
+          description: object stored successfully
+        '400':
+          description: invalid input, object invalid
+        '409':
+          description: an identical object already exists
+        '500':
+          description: server error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameObject'
+        description: game Object to add
+
+  /storage/get/{objectId}:
+    get:
+      summary: retrieve an object from group/overlay storage
+      operationId: getObject
+      parameters:
+        - name: objectId
+          in: path
+          required: true
+          description: object ID of object to _retrieve_.
+          schema:
+            type: string
+            format: string
+            example: 111
+      responses:
+        '200':
+          description: retrieve successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameObject'
+        '400':
+          description: invalid input, object invalid
+        '404':
+          description: object does not exist
+        '500':
+          description: server error
+
+  /storage/update:
+    post:
+      summary: update an object if it exists, otherwise add it to group/overlay storage
+      operationId: updateObject
+      responses:
+        '200':
+          description: object _modified_ successfully
+        '400':
+          description: invalid input, object invalid
+        '404':
+          description: object does not exist
+        '500':
+          description: server error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameObject'
+        description: object to update
+
+  /storage/delete/{objectId}:
+    delete:
+      summary: delete an object from group/overlay storage
+      operationId: deleteObject
+      parameters:
+        - name: objectId
+          in: path
+          required: true
+          description: Object ID of object to _delete_
+          schema:
+            type: string
+            format: string
+            example: 111
+      responses:
+        '200':
+          description: object _deleted_ successfully
+        '400':
+          description: invalid input, object invalid
+        '500':
+          description: server error
+
+  /storage/get/peer-ledger:
+    get:
+      summary: retrieve complete peer-ledger
+      operationId: getPeerLedger
+      responses:
+        '200':
+          description: retrieve successful
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: invalid input, object invalid
+        '404':
+          description: ledger does not exist
+        '500':
+          description: server error
+
+  /storage/get/object-ledger:
+    get:
+      summary: retrieve complete object-ledger
+      operationId: getObjectLedger
+      responses:
+        '200':
+          description: retrieve successful
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: invalid input, object invalid
+        '404':
+          description: ledger does not exist
+        '500':
+          description: server error
+
+  /overlay-storage/put:
+    post:
+      summary: add an object to overlay storage
+      operationId: putOverlayObject
+      responses:
+        '200':
+          description: object stored successfully
+        '400':
+          description: invalid input, object invalid
+        '409':
+          description: an identical object already exists
+        '500':
+          description: server error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameObject'
+        description: game Object to add
+
+  /overlay-storage/get/{objectId}:
+    get:
+      summary: retrieve an object from overlay storage
+      operationId: getOverlayObject
+      parameters:
+        - name: objectId
+          in: path
+          required: true
+          description: object ID of object to _retrieve_.
+          schema:
+            type: string
+            format: string
+            example: 111
+      responses:
+        '200':
+          description: retrieve successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameObject'
+        '400':
+          description: invalid input, object invalid
+        '404':
+          description: object does not exist
+        '500':
+          description: server error
+
+  /group-storage/fast-put:
+    post:
+      summary: add an object to group storage (fast mode)
+      operationId: putGroupObjectFast
+      responses:
+        '200':
+          description: object stored successfully
+        '400':
+          description: invalid input, object invalid
+        '409':
+          description: an identical object already exists
+        '500':
+          description: server error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameObject'
+        description: game Object to add
+
+  /group-storage/safe-put:
+    post:
+      summary: add an object to group storage (safe mode)
+      operationId: putGroupObjectSafe
+      responses:
+        '200':
+          description: object stored successfully
+        '400':
+          description: invalid input, object invalid
+        '409':
+          description: an identical object already exists
+        '500':
+          description: server error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameObject'
+        description: game Object to add
+
+  /group-storage/fast-get/{objectId}:
+    get:
+      summary: retrieve an object from group storage (fast mode)
+      operationId: getGroupObjectFast
+      parameters:
+        - name: objectId
+          in: path
+          required: true
+          description: object ID of object to _retrieve_.
+          schema:
+            type: string
+            format: string
+            example: 111
+      responses:
+        '200':
+          description: retrieve successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameObject'
+        '400':
+          description: invalid input, object invalid
+        '404':
+          description: object does not exist
+        '500':
+          description: server error
+
+  /group-storage/parallel-get/{objectId}:
+    get:
+      summary: retrieve an object from group storage (parallel mode)
+      operationId: getGroupObjectParallel
+      parameters:
+        - name: objectId
+          in: path
+          required: true
+          description: object ID of object to _retrieve_.
+          schema:
+            type: string
+            format: string
+            example: 111
+      responses:
+        '200':
+          description: retrieve successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameObject'
+        '400':
+          description: invalid input, object invalid
+        '404':
+          description: object does not exist
+        '500':
+          description: server error
+
+  /group-storage/safe-get/{objectId}:
+    get:
+      summary: retrieve an object from group storage (safe mode)
+      operationId: getGroupObjectSafe
+      parameters:
+        - name: objectId
+          in: path
+          required: true
+          description: object ID of object to _retrieve_.
+          schema:
+            type: string
+            format: string
+            example: 111
+      responses:
+        '200':
+          description: retrieve successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameObject'
+        '400':
+          description: invalid input, object invalid
+        '404':
+          description: object does not exist
+        '500':
+          description: server error
+
+  /config/storage:
+    post:
+      summary: set storage mode
+      operationId: setStorageMode
+      parameters:
+        - name: storageMode
+          in: query
+          required: true
+          description: Storage mode used for _put_.
+          schema:
+            $ref: '#/components/schemas/StorageMode'
+      responses:
+        '200':
+          description: retrieve successful
+        '400':
+          description: invalid input, object invalid
+        '500':
+          description: server error
+
+  /config/retrieval:
+    post:
+      summary: set retrieve mode
+      operationId: setRetrievalMode
+      parameters:
+        - name: retrievalMode
+          in: query
+          required: true
+          description: Storage mode used for _get_.
+          schema:
+            $ref: '#/components/schemas/RetrievalMode'
+      responses:
+        '200':
+          description: retrieve successful
+        '400':
+          description: invalid input, object invalid
+        '500':
+          description: server error
+
+  /config/groups/migration:
+    post:
+      summary: Enable/disable group migration for this peer
+      operationId: migrationEnable
+      parameters:
+        - name: enabled
+          in: query
+          required: true
+          description: true = enable, false = disable
+          schema:
+            type: boolean
+            example: true
+      responses:
+        '200':
+          description: retrieve successful
+        '400':
+          description: invalid input, object invalid
+        '500':
+          description: server error
+
+  /config/groups/testing/malicious-peer:
+    post:
+      summary: Enable/disable group migration for this peer
+      operationId: maliciousPeerEnable
+      parameters:
+        - name: enabled
+          in: query
+          required: true
+          description: true = enable, false = disable
+          schema:
+            type: boolean
+            example: true
+      responses:
+        '200':
+          description: retrieve successful
+        '400':
+          description: invalid input, object invalid
+        '500':
+          description: server error
+
+  /config/groups/replication-factor:
+    post:
+      summary: Update replication factor for this peer
+      operationId: updateReplicationFactor
+      parameters:
+        - name: rf
+          in: query
+          required: true
+          description: set replication factor
+          schema:
+            type: number
+            example: 3
+      responses:
+        '200':
+          description: update RF successful
+        '400':
+          description: invalid input, object invalid
+        '500':
+          description: server error
+
+components:
+  schemas:
+    StorageMode:
+      type: string
+      enum:
+        - FAST
+        - SAFE
+    RetrievalMode:
+      type: string
+      enum:
+        - FAST
+        - SAFE
+        - PARALLEL
+
+    GameObject:
+      type: object
+      required:
+        - id
+        - creationTime
+        - ttl
+        - value
+      properties:
+        id:
+          type: string
+          minLength: 1
+          example: 111
+        creationTime:
+          description: Creation time in seconds (unix time)
+          type: integer
+          format: int64
+          minimum: 1
+          example: 1897744637
+        lastModified:
+          description: Creation time in seconds (unix time)
+          type: integer
+          format: int64
+          default: 0
+          example: 1897744637
+        ttl:
+          description: Time-to-live in seconds (unix time)
+          type: integer
+          format: int64
+          minimum: 1
+          example: 604800
+        value:
+          description: Base64 encoded data
+          type: string
+          format: byte
+          example: "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"

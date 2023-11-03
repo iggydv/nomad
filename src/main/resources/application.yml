@@ -1,0 +1,78 @@
+server:
+  servlet:
+    context-path: /nomad
+  port: 0
+
+logging:
+  level:
+    root: WARN
+    com:
+      chord:
+        open-chord: WARN
+    net:
+      tomp2p: WARN
+    org:
+      springframework: WARN
+      apache:
+        zookeeper:
+          Zookeeper: WARN
+
+jasypt:
+  encryptor:
+    bean: encryptorBean
+
+spring:
+  jmx:
+    enabled: true
+  resources:
+    add-mappings: true
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    jdbcUrl: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: ENC(LpH8V823DKMsLu6AqinnXfxA7+9GNbzT)
+    password: ENC(vUDaKDfHiWcLrMW2eIypjQNumjyOwi06)
+  h2:
+    console:
+      enabled: false
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  schedule:
+    healthCheck: 20000
+    dhtBootstrap: 500000
+    dbCleanup: 60000
+    ledgerCleanup: 60000
+    # scheduled repair causes a significant amount of additional load depending on the storage method.
+    # this additional load will decrease performance of the network.
+    # Leave repair is built into the logic
+    repair: 6000000
+    updatePosition: 10000
+
+node:
+  # Used for testing only
+  malicious: false
+  group:
+    migration: true
+    voronoiGrouping: true
+  maxPeers: 25
+  storage:
+    replicationFactor: 6
+    mode: "h2"
+    storageMode: "fast"
+    retrievalMode: "parallel"
+  directoryServer:
+    path: "/GroupStorage"
+    hostname: "192.168.178.91"
+    # hostname: "192.168.0.150"
+    # Linux hostname: "192.168.0.166"
+    # GCP hostname: "34.78.132.41"
+  networkHostnames:
+    peerServer: ""
+    peerStorageServer: ""
+    overlayHostname: ""
+    superPeerServer: ""
+    groupStorageServer: ""
+  world:
+    height: 10.0
+    width: 10.0

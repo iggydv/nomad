@@ -1,0 +1,18 @@
+config:
+  target: http://192.168.0.150:6898
+  phases:
+    - duration: 1
+      arrivalRate: 1
+
+scenarios:
+  - name: peer-1
+    weight: 1
+    flow:
+      - post:
+          url: "http://192.168.0.150:4003/nomad/config/groups/migration?enabled=true"
+      - post:
+          url: "http://192.168.0.150:4019/nomad/config/groups/migration?enabled=true"
+      - post:
+          url: "http://192.168.0.150:4029/nomad/config/groups/migration?enabled=true"
+      - post:
+          url: "http://192.168.0.150:4043/nomad/config/groups/migration?enabled=true"

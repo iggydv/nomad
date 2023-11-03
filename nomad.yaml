@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nomad-hs
+  labels:
+    app: nomad
+spec:
+  clusterIP: None
+  selector:
+    app: nomad
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: zk-pdb
+spec:
+  selector:
+    matchLabels:
+      app: nomad
+  maxUnavailable: 1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nomad
+spec:
+  selector:
+    matchLabels:
+      app: nomad
+  serviceName: nomad-hs
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
+  template:
+    metadata:
+      labels:
+        app: nomad
+    spec:
+      hostNetwork: true
+      containers:
+        - name: kubernetes-nomad
+          imagePullPolicy: Never
+          image: "nomad:0.1"
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "0.5"
+      securityContext:
+        runAsUser: 10.000
+        fsGroup: 10.000

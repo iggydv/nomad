@@ -1,0 +1,18 @@
+config:
+  target: http://192.168.0.182:6898
+  phases:
+    - duration: 1
+      arrivalRate: 1
+
+scenarios:
+  - name: peer-1
+    weight: 1
+    flow:
+      - post:
+          url: "http://192.168.0.182:4038/nomad/config/retrieval?retrievalMode=FAST"
+      - post:
+          url: "http://192.168.0.182:4041/nomad/config/retrieval?retrievalMode=FAST"
+      - post:
+          url: "http://192.168.0.182:4044/nomad/config/retrieval?retrievalMode=FAST"
+      - post:
+          url: "http://192.168.0.182:4037/nomad/config/retrieval?retrievalMode=FAST"

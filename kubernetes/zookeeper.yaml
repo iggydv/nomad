@@ -1,0 +1,235 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-server
+  labels:
+    app: zk
+spec:
+  selector:
+    app: zk
+  ports:
+    - port: 2888
+      targetPort: 2888
+      name: server
+      protocol: TCP
+    - port: 3888
+      targetPort: 3888
+      name: leader-election
+      protocol: TCP
+    - name: client
+      protocol: TCP
+      port: 2181
+      targetPort: 2181
+  clusterIP: None
+  type: LoadBalancer
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: zk-cs
+#   labels:
+#     app: zk
+# spec:
+#   selector:
+#     app: zk
+#   ports:
+#     - name: client
+#       protocol: TCP
+#       port: 2181
+#       targetPort: 2181
+#   type: LoadBalancer
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: zk-pdb
+spec:
+  selector:
+    matchLabels:
+      app: zk
+  maxUnavailable: 1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zk
+spec:
+  selector:
+    matchLabels:
+      app: zk
+  serviceName: zookeeper-server
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
+  template:
+    metadata:
+      labels:
+        app: zk
+    spec:
+      hostNetwork: true
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app"
+                    operator: In
+                    values:
+                      - zk
+              topologyKey: "kubernetes.io/hostname"
+      volumes:
+        - name: zoo-config
+          configMap:
+            name: zoo-config
+        - name: zoo-data
+          persistentVolumeClaim:
+            claimName: zoo-pvc
+      containers:
+        - name: zookeeper
+          image: "library/zookeeper:3.6.2"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+          env:
+            - name: ZOO_MY_ID
+              value: "1"
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "0.5"
+          ports:
+            - containerPort: 2181
+              name: client
+            - containerPort: 2888
+              name: server
+            - containerPort: 3888
+              name: leader-election
+          volumeMounts:
+            - name: zoo-data
+              mountPath: /var/lib/zookeeper
+            - name: zoo-config
+              mountPath: /conf
+      securityContext:
+        fsGroup: 2000
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+  # volumeClaimTemplates:
+  #   - metadata:
+  #       name: datadir
+  #       annotations:
+  #         volume.beta.kubernetes.io/storage-class: rook-ceph-block
+  #     spec:
+  #       accessModes: [ "ReadWriteOnce" ]
+  #       storageClassName: rook-cephfs
+  #       resources:
+  #         requests:
+  #           storage: 10Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zoo-config
+  namespace: default
+data:
+  zoo.cfg: |
+    tickTime=10000
+    dataDir=/var/lib/zookeeper
+    clientPort=2181
+    initLimit=10
+    syncLimit=4
+---
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: replicapool
+  namespace: rook-ceph
+spec:
+  failureDomain: host
+  replicated:
+    size: 3
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rook-ceph-block
+# Change "rook-ceph" provisioner prefix to match the operator namespace if needed
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  # clusterID is the namespace where the rook cluster is running
+  clusterID: rook-ceph
+  # Ceph pool into which the RBD image shall be created
+  pool: replicapool
+
+  # RBD image format. Defaults to "2".
+  imageFormat: "2"
+
+  # RBD image features. Available for imageFormat: "2". CSI RBD currently supports only `layering` feature.
+  imageFeatures: layering
+
+  # The secrets contain Ceph admin credentials.
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+
+  # Specify the filesystem type of the volume. If not specified, csi-provisioner
+  # will set default as `ext4`. Note that `xfs` is not recommended due to potential deadlock
+  # in hyperconverged settings where the volume is mounted on the same node as the osds.
+  csi.storage.k8s.io/fstype: ext4
+
+# Delete the rbd volume when a PVC is deleted
+reclaimPolicy: Delete
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: zoo-pv
+  labels:
+    type: local
+spec:
+  storageClassName: rook-ceph-block
+  persistentVolumeReclaimPolicy: Delete
+  hostPath:
+    path: "/mnt/data"
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - iggy-notebook
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zoo-pvc
+  labels:
+    app: zookeeper
+spec:
+  storageClassName: rook-ceph-block
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-all-ingress
+spec:
+  podSelector: { }
+  ingress:
+    - { }
+  policyTypes:
+    - Ingress

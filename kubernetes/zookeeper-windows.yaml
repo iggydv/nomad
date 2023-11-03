@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-hs
+  labels:
+    app: zk
+spec:
+  ports:
+    - port: 2888
+      name: server
+    - port: 3888
+      name: leader-election
+  clusterIP: None
+  selector:
+    app: zk
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-cs
+  labels:
+    app: zk
+spec:
+  ports:
+    - port: 2181
+      name: client
+  selector:
+    app: zk
+  type: LoadBalancer
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: zk-pdb
+spec:
+  selector:
+    matchLabels:
+      app: zk
+  maxUnavailable: 2
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zk
+spec:
+  selector:
+    matchLabels:
+      app: zk
+  serviceName: zk-hs
+  replicas: 3
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: OrderedReady
+  template:
+    metadata:
+      labels:
+        app: zk
+    spec:
+      volumes:
+        - name: zoo-config
+          configMap:
+            name: zoo-config
+#      affinity:
+#        podAntiAffinity:
+#          requiredDuringSchedulingIgnoredDuringExecution:
+#            - labelSelector:
+#                matchExpressions:
+#                  - key: "app"
+#                    operator: In
+#                    values:
+#                      - zk
+#              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: kubernetes-zookeeper
+          imagePullPolicy: Always
+          image: "library/zookeeper:3.6.2"
+          livenessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -ec
+                - |
+                  zkServer.sh status
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "0.5"
+          env:
+            - name: ZOO_REPLICAS
+              value: "3"
+            - name: ZOO_MY_ID
+              value: $ordinal # this does not work!
+          ports:
+            - containerPort: 2181
+              name: client
+            - containerPort: 2888
+              name: server
+            - containerPort: 3888
+              name: leader-election
+          volumeMounts:
+            - name: datadir
+              mountPath: /var/lib/zookeeper
+            - name: zoo-config
+              mountPath: /conf
+#          command:
+#            - /bin/bash
+#            - -ec
+#            - |
+#              zkServer-initialize.sh --force
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+  volumeClaimTemplates:
+    - metadata:
+        name: datadir
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zoo-config
+  namespace: default
+data:
+  zoo.cfg: |
+    tickTime=10000
+    dataDir=/var/lib/zookeeper
+    clientPort=2181
+    initLimit=5
+    syncLimit=2
+#    server.1=zk-0.zk-hs.default.svc.cluster.local:2888:3888
+#    server.2=zk-1.zk-hs.default.svc.cluster.local:2888:3888
+#    server.3=zk-2.zk-hs.default.svc.cluster.local:2888:3888

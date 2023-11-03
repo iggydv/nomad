@@ -1,0 +1,20 @@
+config:
+  target: http://192.168.0.150:6898
+  phases:
+    # number of peers
+    - duration: 1 
+      arrivalRate: 1
+  payload:
+    # path is relative to the location of the test script
+    - path: "../../../hosts.csv"
+      fields:
+        - "host"
+
+scenarios:
+  - name: peer-1
+    weight: 1
+    flow:
+      - post:
+          url: "http://{{ host }}/nomad/config/groups/testing/malicious-peer?enabled=true"
+      # - post:
+      #     url: "http://{{ host }}/nomad/config/groups/testing/malicious-peer?enabled=true"

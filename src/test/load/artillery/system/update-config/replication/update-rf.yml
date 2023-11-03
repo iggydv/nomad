@@ -1,0 +1,19 @@
+config:
+  target: http://192.168.0.150:6898
+  phases:
+    # number of peers
+    - duration: 25
+      arrivalRate: 1
+  payload:
+    # path is relative to the location of the test script
+    - path: "../../../hosts.csv"
+      order: sequence
+      fields:
+        - "host"
+
+scenarios:
+  - name: peer-1
+    weight: 1
+    flow:
+      - post:
+          url: "http://{{ host }}/nomad/config/groups/replication-factor?rf=6"

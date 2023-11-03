@@ -1,0 +1,48 @@
+config:
+  payload:
+    # path is relative to the location of the test script
+    - path: "test-subset.csv"
+      fields:
+        - "id"
+        - "creationTime"
+        - "ttl"
+    - path: "../hosts.csv"
+      fields:
+        - "host"
+  target: http://192.168.0.150:6898
+  phases:
+    - duration: 500
+      arrivalRate: 5
+    # - duration: 60
+    #   arrivalRate: 10
+    # - duration: 60
+    #   arrivalRate: 50
+    # - duration: 800
+    #   arrivalRate: 100
+
+scenarios:
+  # ====================================== GROUP-GET ======================================
+  # - name: safe-get
+  #   weight: 1
+  #   flow:
+  #     - loop:
+  #       - get:
+  #           url: "http://{{ host }}/nomad/group-storage/safe-get/{{ id }}"
+  #       count: 1
+
+  # - name: parallel-get
+  #   weight: 1
+  #   flow:
+  #     - loop:
+  #         - get:
+  #             url: "http://{{ host }}/nomad/group-storage/parallel-get/{{ id }}"
+  #       count: 1
+  
+  - name: fast-get
+    weight: 1
+    flow:
+      - loop:
+        - get:
+            url: "http://{{ host }}/nomad/group-storage/fast-get/{{ id }}"
+        count: 1
+

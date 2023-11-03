@@ -1,0 +1,18 @@
+config:
+  target: http://192.168.0.182:6898
+  phases:
+    - duration: 1
+      arrivalRate: 1
+
+scenarios:
+  - name: peer-1
+    weight: 1
+    flow:
+      - post:
+          url: "http://192.168.0.182:4007/nomad/config/storage?storageMode=SAFE"
+      - post:
+          url: "http://192.168.0.182:4029/nomad/config/storage?storageMode=SAFE"
+      - post:
+          url: "http://192.168.0.182:4006/nomad/config/storage?storageMode=SAFE"
+      - post:
+          url: "http://192.168.0.182:4014/nomad/config/storage?storageMode=SAFE"
