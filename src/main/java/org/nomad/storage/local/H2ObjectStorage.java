@@ -37,7 +37,6 @@ public class H2ObjectStorage implements LocalStorage {
     private static final Logger logger = LoggerFactory.getLogger(H2ObjectStorage.class);
     private final GenericGroupLedger groupLedger;
     private final Config config;
-
     @Autowired
     ApplicationContext appCtx;
     private Connection connection;

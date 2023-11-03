@@ -3,7 +3,7 @@ package org.nomad.grpc.management.services;
 import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.nomad.grpc.GRPCUtils;
@@ -76,7 +76,7 @@ public class PeerService extends PeerServiceGrpc.PeerServiceImplBase {
     @Override
     public void repairObjects(RepairObjectRequest repairObjectRequest, StreamObserver<RepairObjectResponse> responseObserver) {
         logger.info("gRPC 'repairObjects' request received");
-        ArrayList<String> objectsToRepair = new ObjectArrayList<>(repairObjectRequest.getObjectIdsList());
+        ObjectList<String> objectsToRepair = new ObjectArrayList<>(repairObjectRequest.getObjectIdsList());
         boolean result = peer.repairObjects(objectsToRepair);
 
         RepairObjectResponse response = RepairObjectResponse.newBuilder().setResponse(result).build();

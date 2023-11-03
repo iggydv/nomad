@@ -1,6 +1,6 @@
 package org.nomad.application;
 
-import it.unimi.dsi.fastutil.objects.HashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -8,8 +8,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-
-import java.util.HashMap;
 
 public class CliParser {
 
@@ -32,13 +30,13 @@ public class CliParser {
         return options;
     }
 
-    public static HashMap<NomadOption, String> parseCliArguments(String[] args) throws ParseException {
+    public static Object2ObjectOpenHashMap<NomadOption, String> parseCliArguments(String[] args) throws ParseException {
         HelpFormatter helpFormatter = new HelpFormatter();
         Options cliOptions = createCliOptions();
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd;
 
-        HashMap<NomadOption, String> parsedResults = new HashMap<>();
+        Object2ObjectOpenHashMap<NomadOption, String> parsedResults = new Object2ObjectOpenHashMap<>();
 
         try {
             cmd = parser.parse(cliOptions, args);

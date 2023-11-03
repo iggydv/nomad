@@ -1,7 +1,7 @@
 package org.nomad.pithos.mappers;
 
 import com.google.protobuf.ByteString;
-import it.unimi.dsi.fastutil.objects.HashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectCollection;
 import org.junit.jupiter.api.Test;
 import org.nomad.grpc.superpeerservice.MultiMapPair;
@@ -47,8 +47,8 @@ class CustomMappersTest {
         grpcMap.put("key", org.nomad.grpc.superpeerservice.MetaDataCollection.newBuilder().addAllValues(iterableGrpc).build());
 
         MultiMapPair m1 = MultiMapPair.newBuilder().putAllKeyPair(grpcMap).build();
-        HashMap<String, org.nomad.grpc.superpeerservice.MetaDataCollection> actualGRPCMap = testMapper.convertToGrpcMap(map);
-        HashMap<String, ObjectCollection<MetaData>> actualMap = testMapper.convertToMap(m1);
+        Object2ObjectOpenHashMap<String, org.nomad.grpc.superpeerservice.MetaDataCollection> actualGRPCMap = testMapper.convertToGrpcMap(map);
+        Object2ObjectOpenHashMap<String, ObjectCollection<MetaData>> actualMap = testMapper.convertToMap(m1);
 
         assertEquals(grpcMap, actualGRPCMap);
         assertEquals(map, actualMap);

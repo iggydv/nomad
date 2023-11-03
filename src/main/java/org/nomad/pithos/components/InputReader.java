@@ -1,18 +1,17 @@
 package org.nomad.pithos.components;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.nomad.grpc.superpeerservice.VirtualPosition;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class InputReader {
 
-    public ArrayList<VirtualPosition> readMovements(int fileNumber) throws IOException {
-        ArrayList<VirtualPosition> movements = new ArrayList<>();
+    public ObjectList<VirtualPosition> readMovements(int fileNumber) throws IOException {
+        ObjectList<VirtualPosition> movements = new ObjectArrayList<>();
         InputStream inputStream = null;
         Scanner sc = null;
         try {
@@ -56,7 +55,7 @@ public class InputReader {
         return movements;
     }
 
-    public ArrayList<VirtualPosition> readMovements() throws IOException {
+    public ObjectList<VirtualPosition> readMovements() throws IOException {
         Scanner kbd = new Scanner(System.in);
         String decision;
         System.out.println("Please enter movement model number: ");

@@ -1,5 +1,6 @@
 package org.nomad.storage.overlay;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.NoSuchElementException;
@@ -35,17 +35,20 @@ class TomP2POverlayStorageTest {
     private TomP2POverlayStorage tomP2POverlayStorage2;
 
     @BeforeAll
-    public void setupAll() throws IOException, InterruptedException {
+    @SneakyThrows
+    public void setupAll() {
         NetworkUtility.init();
         tomP2POverlayStorage.initOverlay();
         tomP2POverlayStorage.put(buildTestObject("2"));
     }
 
     @AfterAll
-    public void cleanUp() throws InterruptedException {
+    @SneakyThrows
+    public void cleanUp() {
         tomP2POverlayStorage.close();
     }
 
+    @SneakyThrows
     private GameObject buildTestObject(String id) {
         return GameObject.builder()
                 .id(id)
@@ -56,7 +59,8 @@ class TomP2POverlayStorageTest {
     }
 
     @Test
-    public void testPut() throws IOException, ClassNotFoundException, InterruptedException {
+    @SneakyThrows
+    public void testPut() {
         GameObject testObject = GameObject.builder()
                 .id("1a32425")
                 .value("hello".getBytes(StandardCharsets.UTF_8))
@@ -75,7 +79,8 @@ class TomP2POverlayStorageTest {
     }
 
     @Test
-    public void testGet() throws IOException, ClassNotFoundException, InterruptedException {
+    @SneakyThrows
+    public void testGet() {
         GameObject testObject = buildTestObject("2");
         tomP2POverlayStorage.put(testObject);
         Assertions.assertEquals(testObject, tomP2POverlayStorage.get("2"));
@@ -83,7 +88,8 @@ class TomP2POverlayStorageTest {
     }
 
     @Test
-    public void testUpdate() throws IOException, ClassNotFoundException, InterruptedException {
+    @SneakyThrows
+    public void testUpdate() {
         GameObject testObjectY = buildTestObject("y");
         tomP2POverlayStorage.put(testObjectY);
         Assertions.assertEquals(testObjectY, tomP2POverlayStorage.get("y"));
@@ -94,7 +100,8 @@ class TomP2POverlayStorageTest {
     }
 
     @Test
-    public void testDelete() throws IOException, InterruptedException, ClassNotFoundException {
+    @SneakyThrows
+    public void testDelete() {
         GameObject testObjectX = buildTestObject("x");
         tomP2POverlayStorage.put(testObjectX);
         Assertions.assertEquals(testObjectX, tomP2POverlayStorage.get("x"));
@@ -103,7 +110,8 @@ class TomP2POverlayStorageTest {
     }
 
     @Test
-    public void testGetExpiredObject() throws IOException, InterruptedException, ClassNotFoundException {
+    @SneakyThrows
+    public void testGetExpiredObject() {
         GameObject testObject = GameObject.builder()
                 .id("99")
                 .value("hello".getBytes(StandardCharsets.UTF_8))
@@ -118,7 +126,8 @@ class TomP2POverlayStorageTest {
     }
 
     @Test
-    public void testJoinOverlay() throws IOException, InterruptedException, ClassNotFoundException {
+    @SneakyThrows
+    public void testJoinOverlay() {
         int id = tomP2POverlayStorage2.joinOverlay("localhost:" + tomP2POverlayStorage.getPeerDHTPort());
         GameObject testObject = buildTestObject("abc");
         tomP2POverlayStorage.put(testObject);

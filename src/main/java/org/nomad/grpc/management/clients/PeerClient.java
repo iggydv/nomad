@@ -7,7 +7,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.protobuf.Empty;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
-import it.unimi.dsi.fastutil.objects.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.nomad.grpc.peerservice.AddPeerRequest;
 import org.nomad.grpc.peerservice.AddPeerResponse;
@@ -52,7 +52,7 @@ public class PeerClient {
         return managedChannel.authority();
     }
 
-    public boolean repairObjects(ArrayList<String> objectsToRepair) {
+    public boolean repairObjects(ObjectList<String> objectsToRepair) {
         RepairObjectRequest request = RepairObjectRequest.newBuilder().addAllObjectIds(objectsToRepair).build();
         logger.info("Sending 'repairObjects' request to {}", managedChannel.authority());
         RepairObjectResponse response = blockingStub.withDeadlineAfter(60, TimeUnit.SECONDS).repairObjects(request);

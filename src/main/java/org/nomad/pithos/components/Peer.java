@@ -2,6 +2,7 @@ package org.nomad.pithos.components;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.nomad.commons.NetworkUtility;
@@ -27,7 +28,6 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.Random;
@@ -76,10 +76,10 @@ public class Peer {
     private String peerGroupStorageHost;
     private String peerServer;
     private String group;
-    private ArrayList<String> groupStoragePeerList; // populated by SuperPeer
+    private ObjectList<String> groupStoragePeerList; // populated by SuperPeer
     private SuperPeerClient superPeerClient;
     private VirtualPosition virtualPosition;
-    private ArrayList<VirtualPosition> movements;
+    private ObjectList<VirtualPosition> movements;
     private int lastPosition = 0;
     private boolean isActive = false;
 
@@ -333,7 +333,7 @@ public class Peer {
         return result;
     }
 
-    public boolean repairObjects(ArrayList<String> objects) {
+    public boolean repairObjects(ObjectList<String> objects) {
         for (String objectId : objects) {
             try {
                 // only check within the group, for repairs one does not want to check overlay

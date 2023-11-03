@@ -3,10 +3,10 @@ package org.nomad.storage.group;
 import com.google.common.collect.Sets;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import it.unimi.dsi.fastutil.objects.HashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayLists;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.nomad.config.Config;
 import org.nomad.grpc.management.clients.GroupStorageClient;
@@ -43,7 +43,7 @@ public class GroupStorage {
     private final GroupStorageServer server;
     private final Config configuration;
     private final GenericGroupLedger groupLedger;
-    private final HashMap<String, GroupStorageClient> clientsMap = new HashMap<>();
+    private final Object2ObjectOpenHashMap<String, GroupStorageClient> clientsMap = new Object2ObjectOpenHashMap<>();
     private final Random random = new Random();
     private boolean initialized = false;
     private SuperPeerClient superPeerClient;
@@ -69,7 +69,7 @@ public class GroupStorage {
         server.init(port, sp);
         server.start();
         replicationFactor = configuration.getStorage().getReplicationFactor();
-        updateClients(ArrayLists.emptyList());
+        updateClients(ObjectLists.emptyList());
         initialized = true;
     }
 
@@ -118,7 +118,7 @@ public class GroupStorage {
     }
 
     // Used only in testing
-    public void setClients(ArrayList<String> clients) {
+    public void setClients(ObjectList<String> clients) {
         logger.debug("Received list: {}", clients);
         clients.forEach(target -> {
             if (!target.equals(server.getHost()) && !target.isEmpty() && !clientsMap.containsKey(target)) {
@@ -130,7 +130,7 @@ public class GroupStorage {
         });
     }
 
-    public void updateClients(ArrayList<String> clients) {
+    public void updateClients(ObjectList<String> clients) {
         logger.debug("Received list: {}", clients);
         logger.debug("Updating group-storage clients for {}...", server.getHost());
 
@@ -233,7 +233,7 @@ public class GroupStorage {
         }
 
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        ArrayList<String> clientHostnames = new ObjectArrayList<>(clientsMap.keySet());
+        ObjectList<String> clientHostnames = new ObjectArrayList<>(clientsMap.keySet());
         Collections.shuffle(clientHostnames, random);
         ObjectOpenHashSet<Callable<Boolean>> callable = new ObjectOpenHashSet<>();
         int replicaCount = 0;
@@ -269,7 +269,7 @@ public class GroupStorage {
      **/
     public boolean safePut(GameObject gameObject) throws IllegalStateException {
         logger.debug("safe put");
-        ArrayList<Future<Boolean>> results;
+        ObjectList<Future<Boolean>> results;
         int successfulResults = 0;
         if (clientsMap.values().isEmpty()) {
             logger.warn("No additional group members...");
@@ -277,7 +277,7 @@ public class GroupStorage {
         }
 
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        ArrayList<String> clientHostnames = new ObjectArrayList<>(clientsMap.keySet());
+        ObjectList<String> clientHostnames = new ObjectArrayList<>(clientsMap.keySet());
         Collections.shuffle(clientHostnames, random);
         ObjectOpenHashSet<Callable<Boolean>> callable = new ObjectOpenHashSet<>();
         int replicaCount = 0;
@@ -334,7 +334,7 @@ public class GroupStorage {
 
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         ObjectOpenHashSet<Callable<GameObject>> callable = new ObjectOpenHashSet<>();
-        ArrayList<String> peersThatStoreObject = groupLedger.removePeersNotStoringObject(clientsMap.keySet(), id);
+        ObjectList<String> peersThatStoreObject = groupLedger.removePeersNotStoringObject(clientsMap.keySet(), id);
         Collections.shuffle(peersThatStoreObject, random);
 
         peersThatStoreObject.forEach(clientHostname -> {
@@ -370,7 +370,7 @@ public class GroupStorage {
             throw new NoSuchElementException();
         }
 
-        ArrayList<String> peersThatStoreObject = groupLedger.removePeersNotStoringObject(clientsMap.keySet(), id);
+        ObjectList<String> peersThatStoreObject = groupLedger.removePeersNotStoringObject(clientsMap.keySet(), id);
         Collections.shuffle(peersThatStoreObject, random);
         if (!peersThatStoreObject.isEmpty()) {
             GroupStorageClient client = clientsMap.get(peersThatStoreObject.iterator().next());
@@ -399,10 +399,10 @@ public class GroupStorage {
         }
 
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        ArrayList<Future<GameObject>> resultObjects;
+        ObjectList<Future<GameObject>> resultObjects;
         ObjectOpenHashSet<Callable<GameObject>> callable = new ObjectOpenHashSet<>();
-        HashMap<GameObject, Integer> quorumMap = new HashMap<>();
-        ArrayList<String> peersThatStoreObject = groupLedger.removePeersNotStoringObject(clientsMap.keySet(), id);
+        Object2ObjectOpenHashMap<GameObject, Integer> quorumMap = new Object2ObjectOpenHashMap<>();
+        ObjectList<String> peersThatStoreObject = groupLedger.removePeersNotStoringObject(clientsMap.keySet(), id);
         Collections.shuffle(peersThatStoreObject, random);
         int replicaCount = 0;
         int successfulResults = 0;
@@ -471,7 +471,7 @@ public class GroupStorage {
      **/
     public boolean safeUpdate(GameObject gameObject) throws IOException {
         logger.debug("safe put");
-        ArrayList<Future<Boolean>> results;
+        ObjectList<Future<Boolean>> results;
         int successfulResults = 0;
         if (clientsMap.values().isEmpty()) {
             logger.warn("No additional group members...");
@@ -479,7 +479,7 @@ public class GroupStorage {
         }
 
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        ArrayList<String> clientHostnames = new ObjectArrayList<>(clientsMap.keySet());
+        ObjectList<String> clientHostnames = new ObjectArrayList<>(clientsMap.keySet());
         Collections.shuffle(clientHostnames, random);
         ObjectOpenHashSet<Callable<Boolean>> callable = new ObjectOpenHashSet<>();
         int replicaCount = 0;
@@ -537,7 +537,7 @@ public class GroupStorage {
         }
 
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        ArrayList<String> clientHostnames = new ObjectArrayList<>(clientsMap.keySet());
+        ObjectList<String> clientHostnames = new ObjectArrayList<>(clientsMap.keySet());
         Collections.shuffle(clientHostnames, random);
         ObjectOpenHashSet<Callable<Boolean>> callable = new ObjectOpenHashSet<>();
         int replicaCount = 0;

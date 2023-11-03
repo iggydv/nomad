@@ -1,7 +1,7 @@
 package org.nomad.delegation;
 
-import it.unimi.dsi.fastutil.objects.HashMap;
-import it.unimi.dsi.fastutil.objects.ArrayList;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.nomad.delegation.models.GroupData;
 import org.nomad.delegation.models.NeighbourData;
@@ -40,9 +40,9 @@ public interface DirectoryServerClient {
      * @return List<String> Hostnames of all clients in the group (extracts from each group member)
      * @throws Exception if the Zookeeper commands fail
      */
-    ArrayList<String> getGroupStorageHostnames(String group) throws Exception;
+    ObjectList<String> getGroupStorageHostnames(String group) throws Exception;
 
-    ArrayList<String> getPeerHostnames(String group) throws Exception;
+    ObjectList<String> getPeerHostnames(String group) throws Exception;
 
     /**
      * @return String Hostname of a client in the group
@@ -79,7 +79,7 @@ public interface DirectoryServerClient {
 
     String getGroupMemberDHTHostname(String groupName) throws Exception;
 
-    HashMap<String, String> getDataMap();
+    Object2ObjectOpenHashMap<String, String> getDataMap();
 
     /**
      * MIGRATION

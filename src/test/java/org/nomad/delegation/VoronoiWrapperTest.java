@@ -1,7 +1,7 @@
 package org.nomad.delegation;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -16,7 +16,7 @@ import java.util.Random;
 class VoronoiWrapperTest {
 
     VoronoiWrapper subject = new VoronoiWrapper(10.000, 10.000);
-    ArrayList<VoronoiSitePoint> points = new ObjectArrayList<>();
+    ObjectList<VoronoiSitePoint> points = new ObjectArrayList<>();
 
     @BeforeEach
     void setup() {
@@ -41,7 +41,7 @@ class VoronoiWrapperTest {
     void test() {
         Random r = new Random();
         long start = System.currentTimeMillis();
-        ArrayList<VoronoiSitePoint> points2 = new ObjectArrayList<>();
+        ObjectList<VoronoiSitePoint> points2 = new ObjectArrayList<>();
         for (int i = 0; i <= 100000; i++) {
             points2.add(new VoronoiSitePoint("a" + i, r.nextDouble() * 10.0, r.nextDouble() * 10.0));
         }

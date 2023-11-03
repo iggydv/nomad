@@ -1,8 +1,8 @@
 package org.nomad.storage.group;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayLists;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -46,24 +46,24 @@ class GroupStorageTest {
 
     @Test
     void updateClients() {
-        ArrayList<String> initialList_1 = new ObjectArrayList<>();
-        ArrayList<String> updated_1 = new ObjectArrayList<>(Lists.newArrayList("1", "2", "4", "5"));
+        ObjectList<String> initialList_1 = new ObjectArrayList<>();
+        ObjectList<String> updated_1 = new ObjectArrayList<>(Lists.newArrayList("1", "2", "4", "5"));
         groupStorage.setClients(initialList_1);
         groupStorage.updateClients(updated_1);
         assertTrue(updated_1.containsAll(groupStorage.getClients()));
 
         groupStorage.clearMap();
 
-        ArrayList<String> initialList_2 = new ObjectArrayList<>(Lists.newArrayList("1", "2", "3"));
-        ArrayList<String> updated_2 = new ObjectArrayList<>(Lists.newArrayList("1", "2", "4", "5"));
+        ObjectList<String> initialList_2 = new ObjectArrayList<>(Lists.newArrayList("1", "2", "3"));
+        ObjectList<String> updated_2 = new ObjectArrayList<>(Lists.newArrayList("1", "2", "4", "5"));
         groupStorage.setClients(initialList_2);
         groupStorage.updateClients(updated_2);
         assertTrue(updated_2.containsAll(groupStorage.getClients()));
 
         groupStorage.clearMap();
 
-        ArrayList<String> initialList_3 = new ObjectArrayList<>(Lists.newArrayList("localhost:9919", "localhost:9929", "localhost:9939", "localhost:9949", "localhost:9959"));
-        ArrayList<String> updated_3 = new ObjectArrayList<>(Lists.newArrayList());
+        ObjectList<String> initialList_3 = new ObjectArrayList<>(Lists.newArrayList("localhost:9919", "localhost:9929", "localhost:9939", "localhost:9949", "localhost:9959"));
+        ObjectList<String> updated_3 = new ObjectArrayList<>(Lists.newArrayList());
         groupStorage.setClients(initialList_3);
         groupStorage.updateClients(updated_3);
         assertTrue(updated_3.containsAll(groupStorage.getClients()));
@@ -75,7 +75,7 @@ class GroupStorageTest {
         groupStorage.init(0, superPeerClient);
 
         //  RF reachable
-        ArrayList<String> updated_1 = new ObjectArrayList<>(Lists.newArrayList("1", "2", "4", "5"));
+        ObjectList<String> updated_1 = new ObjectArrayList<>(Lists.newArrayList("1", "2", "4", "5"));
         groupStorage.setClients(updated_1);
         assertTrue(groupStorage.quorum(3));
         assertTrue(groupStorage.quorum(4));
@@ -85,13 +85,13 @@ class GroupStorageTest {
         groupStorage.clearMap();
 
         // RF unreachable
-        ArrayList<String> updated_2 = new ObjectArrayList<>(Lists.newArrayList("1", "2"));
+        ObjectList<String> updated_2 = new ObjectArrayList<>(Lists.newArrayList("1", "2"));
         groupStorage.setClients(updated_2);
         assertFalse(groupStorage.quorum(1));
         assertTrue(groupStorage.quorum(2));
         groupStorage.clearMap();
 
-        ArrayList<String> updated_3 = new ObjectArrayList<>(Lists.newArrayList("1"));
+        ObjectList<String> updated_3 = new ObjectArrayList<>(Lists.newArrayList("1"));
         groupStorage.setClients(updated_3);
         assertTrue(groupStorage.quorum(1));
     }

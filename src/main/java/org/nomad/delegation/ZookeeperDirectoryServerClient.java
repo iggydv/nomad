@@ -3,9 +3,9 @@ package org.nomad.delegation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import it.unimi.dsi.fastutil.objects.HashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.NonNull;
 import org.apache.curator.RetryLoop;
@@ -80,14 +80,14 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
     private final String INLINE_DHT_PATH = DHT_PATH + "/";
     private final String INLINE_CACHE_PATH = CACHE_PATH + "/";
 
-    private final HashMap<String, String> data = new HashMap<>();
+    private final Object2ObjectOpenHashMap<String, String> data = new Object2ObjectOpenHashMap<>();
     private final String uuid;
     private final Config configuration;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Random random = new Random();
-    private final HashMap<String, LeaderSelectorClient> leaderSelectorClientMap = new HashMap<>();
-    private final HashMap<String, VoronoiSitePoint> voronoiData = new HashMap<>();
-    private final HashMap<String, String> leaders = new HashMap<>();
+    private final Object2ObjectOpenHashMap<String, LeaderSelectorClient> leaderSelectorClientMap = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<String, VoronoiSitePoint> voronoiData = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<String, String> leaders = new Object2ObjectOpenHashMap<>();
     private final Multimap<String, String> dhtBootstrapHostnames = HashMultimap.create();
     private CuratorFramework client;
     private GroupMember groupMember;
@@ -256,7 +256,7 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
         }
     }
 
-    public HashMap<String, String> getDataMap() {
+    public Object2ObjectOpenHashMap<String, String> getDataMap() {
         return data;
     }
 
@@ -524,31 +524,31 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
     }
 
     @Override
-    public ArrayList<String> getGroupStorageHostnames(String group) throws Exception {
+    public ObjectList<String> getGroupStorageHostnames(String group) throws Exception {
         logger.debug("Getting group storage hostnames...");
-        ArrayList<String> hosts = extractDataFromGroup(ZooDatatype.GROUP);
+        ObjectList<String> hosts = extractDataFromGroup(ZooDatatype.GROUP);
         logger.debug("Group storage hosts: {}", Arrays.toString(hosts.toArray()));
         return hosts;
     }
 
     @Override
-    public ArrayList<String> getPeerHostnames(String group) throws Exception {
+    public ObjectList<String> getPeerHostnames(String group) throws Exception {
         logger.debug("Getting peer hostnames...");
-        ArrayList<String> hosts = extractDataFromGroup(ZooDatatype.PEER);
+        ObjectList<String> hosts = extractDataFromGroup(ZooDatatype.PEER);
         logger.debug("Peer hosts: {}", Arrays.toString(hosts.toArray()));
         return hosts;
     }
 
     @Override
     public String getDHTHostnamesFromGroupMember(String group) throws IOException, ClassNotFoundException {
-        ArrayList<String> dhtHostnames = extractDataFromGroup(ZooDatatype.DHT);
+        ObjectList<String> dhtHostnames = extractDataFromGroup(ZooDatatype.DHT);
         logger.info("DHT data from group member: {}", dhtHostnames);
         return dhtHostnames.iterator().hasNext() ? dhtHostnames.iterator().next() : "";
     }
 
     @Override
     public String getGroupMemberDHTHostname(String groupName) throws Exception {
-        ArrayList<String> hostnamesFromCacheMap = new ObjectArrayList<>(dhtBootstrapHostnames.get(groupName));
+        ObjectList<String> hostnamesFromCacheMap = new ObjectArrayList<>(dhtBootstrapHostnames.get(groupName));
         Collections.shuffle(hostnamesFromCacheMap, random);
 
         if (!hostnamesFromCacheMap.isEmpty()) {
@@ -593,7 +593,7 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
         ByteArrayInputStream byteIn = new ByteArrayInputStream(value);
         ObjectInputStream in = new ObjectInputStream(byteIn);
 
-        HashMap<String, String> dataAsMap = (HashMap<String, String>) in.readObject();
+        Object2ObjectOpenHashMap<String, String> dataAsMap = (Object2ObjectOpenHashMap<String, String>) in.readObject();
         in.close();
         String extractedValue = dataAsMap.get(dataKey.getValue());
 
@@ -774,7 +774,7 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
     }
 
     private void callGroupDataDirectly() {
-        HashMap<String, String> tempLeaders = new HashMap<>();
+        Object2ObjectOpenHashMap<String, String> tempLeaders = new Object2ObjectOpenHashMap<>();
         try {
             getGroupNames().forEach(groupName -> {
                 try {
@@ -941,7 +941,7 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
      * Voronoi grouping disabled
      */
     private void randomGroupToJoin(int groupNumberToJoin, int groupCount) {
-        ArrayList<String> joinableGroups = getAnyJoinableGroups();
+        ObjectList<String> joinableGroups = getAnyJoinableGroups();
         logger.info("Joinable groups: {}", joinableGroups);
         if (joinableGroups.isEmpty()) {
             groupNumberToJoin = ++groupCount;
@@ -955,7 +955,7 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
      * Voronoi grouping enabled
      */
     private void voronoiGroupToJoin(VirtualPosition position, int groupNumberToJoin, int groupCount) {
-        ArrayList<String> joinableGroups;
+        ObjectList<String> joinableGroups;
         // Initialise the voronoi map by collecting the site-points of each super-peer and generating the map
         updateVoronoiMap();
         if (voronoiWrapper.voronoiMapGenerated()) {
@@ -987,8 +987,8 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
      * <p>
      * Voronoi grouping disabled
      */
-    protected ArrayList<String> getAnyJoinableGroups() {
-        ArrayList<String> possibleGroupsToJoin = new ObjectArrayList<>();
+    protected ObjectList<String> getAnyJoinableGroups() {
+        ObjectList<String> possibleGroupsToJoin = new ObjectArrayList<>();
         try {
             getGroupNames().forEach(group -> {
                 try {
@@ -1011,8 +1011,8 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
     /**
      * Voronoi grouping enabled
      */
-    protected ArrayList<String> getJoinableVoronoiGroups(VirtualPosition position) {
-        ArrayList<String> possibleGroupsToJoin = new ObjectArrayList<>();
+    protected ObjectList<String> getJoinableVoronoiGroups(VirtualPosition position) {
+        ObjectList<String> possibleGroupsToJoin = new ObjectArrayList<>();
         try {
             // currently we store the IP as the id of voronoi groups
             // this means we need to translate that to a group-name before we return the list of available groups
@@ -1048,7 +1048,7 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
         }
     }
 
-    private ArrayList<String> extractDataFromGroup(ZooDatatype dataKey) throws IOException, ClassNotFoundException {
+    private ObjectList<String> extractDataFromGroup(ZooDatatype dataKey) throws IOException, ClassNotFoundException {
         ObjectArrayList<String> requestedValues = new ObjectArrayList<>();
         Map<String, byte[]> members = groupMember.getCurrentMembers();
 
@@ -1058,7 +1058,7 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
             ObjectInputStream in = new ObjectInputStream(byteIn);
 
             @SuppressWarnings("unchecked")
-            HashMap<String, String> dataAsMap = (HashMap<String, String>) in.readObject();
+            Object2ObjectOpenHashMap<String, String> dataAsMap = (Object2ObjectOpenHashMap<String, String>) in.readObject();
 
             in.close();
             String extractedValue = dataAsMap.get(dataKey.getValue());
@@ -1082,7 +1082,7 @@ public class ZookeeperDirectoryServerClient implements DirectoryServerClient {
         return client.getChildren().forPath(INLINE_CACHE_PATH + groupName).size();
     }
 
-    private ArrayList<String> getGroupNames() throws Exception {
+    private ObjectList<String> getGroupNames() throws Exception {
         client.sync().forPath(CACHE_PATH);
         return new ObjectArrayList<>(client.getChildren().forPath(CACHE_PATH));
     }

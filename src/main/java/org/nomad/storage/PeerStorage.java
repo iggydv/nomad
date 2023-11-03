@@ -1,8 +1,8 @@
 package org.nomad.storage;
 
-import it.unimi.dsi.fastutil.objects.HashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.Data;
 import org.nomad.config.Config;
@@ -94,7 +94,7 @@ public class PeerStorage {
         }
     }
 
-    public void updateGroupStorageClients(ArrayList<String> clients) {
+    public void updateGroupStorageClients(ObjectList<String> clients) {
         groupStorage.updateClients(clients);
     }
 
@@ -150,7 +150,7 @@ public class PeerStorage {
                         }
                         case "safe": {
                             callable.add(() -> groupStorage.safeGet(key));
-                            ArrayList<Future<GameObject>> futures = new ObjectArrayList<>(executorService.invokeAll(callable, 2500, TimeUnit.MILLISECONDS));
+                            ObjectList<Future<GameObject>> futures = new ObjectArrayList<>(executorService.invokeAll(callable, 2500, TimeUnit.MILLISECONDS));
                             executorService.shutdown();
                             resultObject = finalQuorum(futures);
                             if (resultObject != null) {
@@ -229,7 +229,7 @@ public class PeerStorage {
                     case "safe":
                     default: {
                         callable.add(() -> groupStorage.safePut(object));
-                        ArrayList<Future<Boolean>> futures = new ObjectArrayList<>(executorService.invokeAll(callable, 2500, TimeUnit.MILLISECONDS));
+                        ObjectList<Future<Boolean>> futures = new ObjectArrayList<>(executorService.invokeAll(callable, 2500, TimeUnit.MILLISECONDS));
                         executorService.shutdown();
                         boolean allSuccess = allRequestsSucceeded(futures);
 
@@ -274,7 +274,7 @@ public class PeerStorage {
         callable.add(() -> groupStorage.safeUpdate(object));
         callable.add(() -> dhtOverlayStorage.update(object));
 
-        ArrayList<Future<Boolean>> futures = new ObjectArrayList<>(executorService.invokeAll(callable, 2500, TimeUnit.MILLISECONDS));
+        ObjectList<Future<Boolean>> futures = new ObjectArrayList<>(executorService.invokeAll(callable, 2500, TimeUnit.MILLISECONDS));
         executorService.shutdown();
 
         boolean allSuccess = allRequestsSucceeded(futures);
@@ -289,7 +289,7 @@ public class PeerStorage {
         return allSuccess;
     }
 
-    private boolean allRequestsSucceeded(ArrayList<Future<Boolean>> futures) throws InterruptedException {
+    private boolean allRequestsSucceeded(ObjectList<Future<Boolean>> futures) throws InterruptedException {
         int successfulResults = 0;
         int goal = futures.size();
         for (Future<Boolean> future : futures) {
@@ -323,8 +323,8 @@ public class PeerStorage {
      * @param futures
      * @return
      */
-    protected GameObject finalQuorum(ArrayList<Future<GameObject>> futures) {
-        HashMap<GameObject, Integer> quorumMap = new HashMap<>();
+    protected GameObject finalQuorum(ObjectList<Future<GameObject>> futures) {
+        Object2ObjectOpenHashMap<GameObject, Integer> quorumMap = new Object2ObjectOpenHashMap<>();
         int successfulResults = 0;
         for (Future<GameObject> future : futures) {
             if (!future.isCancelled()) {

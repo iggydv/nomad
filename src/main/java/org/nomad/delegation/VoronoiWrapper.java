@@ -1,9 +1,9 @@
 package org.nomad.delegation;
 
-import it.unimi.dsi.fastutil.objects.HashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayLists;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import org.kynosarges.tektosyne.geometry.PointD;
 import org.kynosarges.tektosyne.geometry.RectD;
 import org.kynosarges.tektosyne.geometry.Voronoi;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class VoronoiWrapper {
     private final Logger logger = LoggerFactory.getLogger(VoronoiWrapper.class);
-    private final HashMap<PointD, String> superPeerLocationsWithIds = new HashMap<>(); // Point - Hostname
+    private final Object2ObjectOpenHashMap<PointD, String> superPeerLocationsWithIds = new Object2ObjectOpenHashMap<>(); // Point - Hostname
     private Subdivision voronoiSubdivision;
     private RectD mapLimits;
 
@@ -76,7 +76,7 @@ public class VoronoiWrapper {
      *
      * @param points
      */
-    public void updateVoronoiMap(ArrayList<VoronoiSitePoint> points) {
+    public void updateVoronoiMap(ObjectList<VoronoiSitePoint> points) {
         points.forEach(voronoiSitePoint -> {
             logger.info("Adding new point to map: {}", voronoiSitePoint);
             PointD newSPPoint = new PointD(voronoiSitePoint.getX(), voronoiSitePoint.getY());
@@ -95,13 +95,13 @@ public class VoronoiWrapper {
      * @param point A Super-peer location (site-point)
      * @return List of Neighbour Id's if the point is a site-point, null otherwise
      */
-    public ArrayList<String> getNeighbours(VirtualPosition point) {
+    public ObjectList<String> getNeighbours(VirtualPosition point) {
         PointD pointD = new PointD(point.getX(), point.getY());
         try {
-            ArrayList<PointD> neighbours = new ObjectArrayList<>(voronoiSubdivision.getNeighbors(pointD));
+            ObjectList<PointD> neighbours = new ObjectArrayList<>(voronoiSubdivision.getNeighbors(pointD));
             return new ObjectArrayList<>(neighbours.stream().map(pointD1 -> superPeerLocationsWithIds.get(pointD1)).collect(Collectors.toList()));
         } catch (NullPointerException e) {
-            return ArrayLists.emptyList();
+            return ObjectLists.emptyList();
         }
     }
 

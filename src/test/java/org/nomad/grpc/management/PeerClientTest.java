@@ -4,8 +4,8 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import it.unimi.dsi.fastutil.objects.ArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayLists;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,7 +73,7 @@ class PeerClientTest {
     @Test
     void testRepairObjects() {
         Mockito.when(peer.repairObjects(Mockito.any())).thenReturn(true);
-        ArrayList<String> list = ArrayLists.singleton("1");
+        ObjectList<String> list = ObjectLists.singleton("1");
         boolean result = testClient.repairObjects(list);
         Assertions.assertTrue(result);
     }

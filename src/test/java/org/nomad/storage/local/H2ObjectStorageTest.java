@@ -33,13 +33,10 @@ import static org.junit.Assert.assertEquals;
 public class H2ObjectStorageTest {
 
     final long unixTime = Instant.now().getEpochSecond();
-
     @Autowired
     ApplicationContext appCtx;
-
     @Autowired
     Config config;
-
     @Autowired
     private H2ObjectStorage h2ObjectStorage;
     private GameObject testObject;

@@ -4,9 +4,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import it.unimi.dsi.fastutil.objects.HashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
@@ -51,10 +51,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SuperPeer {
     private final Logger logger = LoggerFactory.getLogger(SuperPeer.class);
 
-    private final HashMap<String, PeerClient> clients = new HashMap<>();
-    private final HashMap<String, String> peerServer_groupStorageServer = new HashMap<>();
+    private final Object2ObjectOpenHashMap<String, PeerClient> clients = new Object2ObjectOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<String, String> peerServer_groupStorageServer = new Object2ObjectOpenHashMap<>();
     // inverse for constant lookup
-    private final HashMap<String, String> groupStorageServer_peerServer = new HashMap<>();
+    private final Object2ObjectOpenHashMap<String, String> groupStorageServer_peerServer = new Object2ObjectOpenHashMap<>();
     private final Config configuration;
     private final DirectoryServerClient directoryServerClient;
     private final String superPeerIp;
@@ -140,7 +140,7 @@ public class SuperPeer {
         if (running && !clients.isEmpty() && !busy.get()) {
             busy.set(true);
             int rf = configuration.getStorage().getReplicationFactor();
-            HashMap<String, Integer> objectRepairCount = groupLedger.objectsThatNeedRepair(rf);
+            Object2ObjectOpenHashMap<String, Integer> objectRepairCount = groupLedger.objectsThatNeedRepair(rf);
             logger.info("RF: {} - Objects needing repair: {}", rf, objectRepairCount);
             repair(objectRepairCount);
             busy.set(false);
@@ -153,14 +153,14 @@ public class SuperPeer {
      * @param objects map of objects and number of repairs required
      * @return true if all repairs were successful, false otherwise
      */
-    protected boolean repair(HashMap<String, Integer> objects) {
-        ArrayList<String> groupStoragePeerList = new ObjectArrayList<>(groupStorageServer_peerServer.keySet());
+    protected boolean repair(Object2ObjectOpenHashMap<String, Integer> objects) {
+        ObjectList<String> groupStoragePeerList = new ObjectArrayList<>(groupStorageServer_peerServer.keySet());
         Multimap<PeerClient, String> peersObjectsRepairMap = HashMultimap.create();
 
         if (!objects.isEmpty() && !groupStoragePeerList.isEmpty()) {
             objects.forEach((objectId, count) -> {
-                ArrayList<String> narrowed = groupLedger.removePeersStoringObject(groupStoragePeerList, objectId);
-                ArrayList<String> randomPicks = pickNRandom(narrowed, count);
+                ObjectList<String> narrowed = groupLedger.removePeersStoringObject(groupStoragePeerList, objectId);
+                ObjectList<String> randomPicks = pickNRandom(narrowed, count);
                 if (!randomPicks.isEmpty()) {
                     randomPicks.forEach(peer -> {
                         PeerClient client = clients.get(groupStorageServer_peerServer.get(peer));
@@ -227,8 +227,8 @@ public class SuperPeer {
         }
     }
 
-    protected ArrayList<String> pickNRandom(List<String> lst, int n) {
-        ArrayList<String> copy = new ObjectArrayList<>(lst);
+    protected ObjectList<String> pickNRandom(List<String> lst, int n) {
+        ObjectList<String> copy = new ObjectArrayList<>(lst);
         Collections.shuffle(copy);
         return n > copy.size() ? copy.subList(0, copy.size()) : copy.subList(0, n);
     }

@@ -3,7 +3,7 @@ package org.nomad.storage;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.apache.commons.lang3.concurrent.ConcurrentUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -228,15 +228,15 @@ class PeerStorageTest {
         Future<GameObject> g2 = ConcurrentUtils.constantFuture(testObject2);
         Future<GameObject> g3 = ConcurrentUtils.constantFuture(testObject3);
 
-        ArrayList<Future<GameObject>> list = new ObjectArrayList<>(Arrays.asList(g1, g1, g1));
+        ObjectList<Future<GameObject>> list = new ObjectArrayList<>(Arrays.asList(g1, g1, g1));
         GameObject finalGameObject = peerStorage.finalQuorum(list);
         Assertions.assertEquals(testObject1, finalGameObject);
 
-        ArrayList<Future<GameObject>> list1 = new ObjectArrayList<>(Arrays.asList(g1, g1, g2));
+        ObjectList<Future<GameObject>> list1 = new ObjectArrayList<>(Arrays.asList(g1, g1, g2));
         GameObject finalGameObject1 = peerStorage.finalQuorum(list1);
         Assertions.assertEquals(testObject1, finalGameObject1);
 
-        ArrayList<Future<GameObject>> list2 = new ObjectArrayList<>(Arrays.asList(g1, g3, g2));
+        ObjectList<Future<GameObject>> list2 = new ObjectArrayList<>(Arrays.asList(g1, g3, g2));
         GameObject finalGameObject2 = peerStorage.finalQuorum(list2);
         Assertions.assertNull(finalGameObject2);
     }

@@ -1,7 +1,7 @@
 package org.nomad.pithos.components;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -33,18 +33,18 @@ class SuperPeerTest {
     @Test
     void pickNRandom() {
 
-        ArrayList<String> reference = new ObjectArrayList<>(Arrays.asList("1", "2", "3"));
+        ObjectList<String> reference = new ObjectArrayList<>(Arrays.asList("1", "2", "3"));
 
-        ArrayList<String> result = superPeer.pickNRandom(reference, 3);
+        ObjectList<String> result = superPeer.pickNRandom(reference, 3);
         assertTrue(result.containsAll(reference));
 
-        ArrayList<String> result2 = superPeer.pickNRandom(reference, 2);
+        ObjectList<String> result2 = superPeer.pickNRandom(reference, 2);
         assertTrue(result2.size() == 2);
 
-        ArrayList<String> result3 = superPeer.pickNRandom(reference, 1);
+        ObjectList<String> result3 = superPeer.pickNRandom(reference, 1);
         assertTrue(result3.size() == 1);
 
-        ArrayList<String> result4 = superPeer.pickNRandom(reference, 0);
+        ObjectList<String> result4 = superPeer.pickNRandom(reference, 0);
         assertTrue(result4.size() == 0);
     }
 }

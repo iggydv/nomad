@@ -1,6 +1,7 @@
 package org.nomad.application;
 
 import io.swagger.annotations.SwaggerDefinition;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.apache.commons.cli.ParseException;
 import org.nomad.pithos.MainController;
 import org.nomad.pithos.models.ComponentType;
@@ -16,8 +17,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
-import java.util.HashMap;
 
 import static org.nomad.application.CliParser.NomadOption.DHT;
 import static org.nomad.application.CliParser.NomadOption.MODE;
@@ -44,7 +43,7 @@ public class Nomad extends SpringBootServletInitializer {
     }
 
     public static void main(String... args) throws ParseException {
-        HashMap<CliParser.NomadOption, String> cliArgs = CliParser.parseCliArguments(args);
+        Object2ObjectOpenHashMap<CliParser.NomadOption, String> cliArgs = CliParser.parseCliArguments(args);
 
         mode = cliArgs.get(MODE);
         dht = cliArgs.get(DHT);
