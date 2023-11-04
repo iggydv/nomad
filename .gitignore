@@ -166,3 +166,5 @@ src/test/load/artillery/overlay/35-peers-overlay-put.json.html
 nomad-rocksdb/
 
 src/test/load/artillery/system/update-tests/
+
+.project
